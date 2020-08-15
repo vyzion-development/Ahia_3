@@ -51,6 +51,7 @@ class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     thumbnail = models.ImageField()
     categories = models.ManyToManyField(Category)
+    file = models.FileField(null=True,blank=True,upload_to='Files')
     featured = models.BooleanField()
     previous_post = models.ForeignKey(
         'self', related_name='previous', on_delete=models.SET_NULL, blank=True, null=True)
