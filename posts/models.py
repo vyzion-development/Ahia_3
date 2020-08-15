@@ -47,6 +47,7 @@ class Post(models.Model):
     content = HTMLField(max_length=500, blank=True)
     # comment_count = models.IntegerField(default = 0)
     # view_count = models.IntegerField(default = 0)
+    #textfiieleds not working
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     thumbnail = models.ImageField()
     categories = models.ManyToManyField(Category)
