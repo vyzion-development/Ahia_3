@@ -312,10 +312,11 @@ def accept_offer(request,  comment_id, asset_id):
     message = f"{asset.author} accepted your offer,{comment.content}, in exchange for {asset}. Contact them at {asset.author.user.email} to complete the exchange"
     from_email = "AhiaMarketPlace@gmail.com"
     recipient_list= ['{{asset.author.user.email}}', '{{comment.user.email}}']
-    email = send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    email = EmailMessage(subject, message, from_email, recipient_list)
     asset.is_traded = True 
-    asset.comment.asset.is_traded = True
+    comment.asset_offered.is_traded = True
     asset.save()
+    comment.save()
     email.attach_file(asset.file.path)
     email.attach_file(comment.asset_offered.file.path)
     email.send()
