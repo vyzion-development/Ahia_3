@@ -39,11 +39,14 @@ urlpatterns = [
     path('post/<pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
     path('tinymce/', include('tinymce.urls')),
     path('accounts/', include('allauth.urls')),
-    path('accept_offer/<int:comment_id>/<int:asset_id>/'  , accept_offer, name='accept-offer'),
+    path(
+        'accept_offer/<int:comment_id>/<int:asset_id>/',
+        accept_offer,
+        name='accept-offer'),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+	urlpatterns += static(
+	    settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+	urlpatterns += static(
+	    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
