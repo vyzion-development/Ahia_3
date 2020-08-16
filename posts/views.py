@@ -10,7 +10,7 @@ from .models import Post, Author, PostView, Comment
 from marketing.forms import EmailSignupForm
 from marketing.models import Signup
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 
 User = get_user_model()
 
@@ -150,6 +150,7 @@ class PostDetailView(DetailView):
     template_name = 'post.html'
     context_object_name = 'post'
     form = CommentForm()
+   
 
     def get_object(self):
         obj = super().get_object()
@@ -168,6 +169,7 @@ class PostDetailView(DetailView):
         context['page_request_var'] = "page"
         context['category_count'] = category_count
         context['form'] = self.form
+        self.form.fields['asset_offered'].queryset=Post.objects.filter(author__user=self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -304,8 +306,12 @@ def accept_offer(request,  comment_id, asset_id):
     message = f"{asset.author} accepted your offer,{comment.content}, in exchange for {asset}. Contact them at {asset.author.user.email} to complete the exchange"
     from_email = "AhiaMarketPlace@gmail.com"
     recipient_list= ['{{asset.author.user.email}}', '{{comment.user.email}}']
-    send_mail(subject, message, from_email, recipient_list)
+    email = EmailMessage(subject, message, from_email, recipient_list)
     asset.is_traded = True 
+    asset.comment.asset.is_traded = True
     asset.save()
+    email.attach_file(asset.file.path)
+    email.attach_file(comment.asset_offered.file.path)
+    email.send()
     return render(request, 'offer_accepted.html')
     
