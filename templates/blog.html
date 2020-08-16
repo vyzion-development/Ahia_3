@@ -11,6 +11,7 @@
             <div class="row">
               <!-- post -->
               {% for post in queryset %}
+              {% if not post.is_traded %}
               <div class="post col-xl-6">
                 <div class="post-thumbnail"><a href="{{ post.get_absolute_url }}"><img src="{{ post.thumbnail.url }}" alt="..." class="img-fluid"></a></div>
                 <div class="post-details">
@@ -34,8 +35,10 @@
                   </footer>
                 </div>
               </div>
+              {% endif %}
               {% endfor %}
             </div>
+
             <!-- Pagination -->
             <nav aria-label="Page navigation example">
               <ul class="pagination pagination-template d-flex justify-content-center">

@@ -17,7 +17,7 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('title', 'overview', 'content', 'thumbnail', 
-        'categories', 'featured', 'previous_post', 'next_post')
+        'categories', 'featured', 'previous_post', 'next_post', 'file')
 
 
 class CommentForm(forms.ModelForm):
@@ -26,7 +26,12 @@ class CommentForm(forms.ModelForm):
         'placeholder': 'Type your comment',
         'id': 'usercomment',
         'rows': '4'
+
     }))
     class Meta:
         model = Comment
-        fields = ('content', )
+        fields = ('content', 'asset_offered')
+
+    # def __init__(self, user, *args, **kwargs):
+    #     super(CommentForm, self). __init__(*args, **kwargs)
+    #     self.fields['asset_offered'].queryset=Post.objects.filter(author__user=self.request.user)

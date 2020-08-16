@@ -16,7 +16,8 @@ from posts.views import (
     PostDetailView,
     PostCreateView,
     PostUpdateView,
-    PostDeleteView
+    PostDeleteView,
+    accept_offer,
 )
 from marketing.views import email_list_signup
 
@@ -37,7 +38,8 @@ urlpatterns = [
     # path('post/<id>/delete/', post_delete, name='post-delete'),
     path('post/<pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
     path('tinymce/', include('tinymce.urls')),
-    path('accounts/', include('allauth.urls'))
+    path('accounts/', include('allauth.urls')),
+    path('accept_offer/<int:comment_id>/<int:asset_id>/'  , accept_offer, name='accept-offer'),
 ]
 
 if settings.DEBUG:

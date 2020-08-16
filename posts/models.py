@@ -15,11 +15,12 @@ class PostView(models.Model):
 
 
 class Author(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='author')
     profile_picture = models.ImageField()
 
     def __str__(self):
         return self.user.username
+
 
 
 class Category(models.Model):
@@ -30,15 +31,17 @@ class Category(models.Model):
 
 
 class Comment(models.Model):
+   
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
     post = models.ForeignKey(
         'Post', related_name='comments', on_delete=models.CASCADE)
-
+    asset_offered = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='assets')
     def __str__(self):
         return self.user.username
-
+    
+    
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
@@ -47,14 +50,17 @@ class Post(models.Model):
     content = HTMLField(max_length=500, blank=True)
     # comment_count = models.IntegerField(default = 0)
     # view_count = models.IntegerField(default = 0)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    #textfiieleds not working
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name = "posts")
     thumbnail = models.ImageField()
     categories = models.ManyToManyField(Category)
+    file = models.FileField(null=True,blank=True, upload_to='Files')
     featured = models.BooleanField()
     previous_post = models.ForeignKey(
         'self', related_name='previous', on_delete=models.SET_NULL, blank=True, null=True)
     next_post = models.ForeignKey(
         'self', related_name='next', on_delete=models.SET_NULL, blank=True, null=True)
+    is_traded = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -85,3 +91,6 @@ class Post(models.Model):
     @property
     def view_count(self):
         return PostView.objects.filter(post=self).count()
+
+   
+

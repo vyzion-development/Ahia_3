@@ -6,9 +6,15 @@ from django.views.generic import View, ListView, DetailView, CreateView, UpdateV
 from django.db.utils import OperationalError
 
 from .forms import CommentForm, PostForm
-from .models import Post, Author, PostView
+from .models import Post, Author, PostView, Comment
 from marketing.forms import EmailSignupForm
 from marketing.models import Signup
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail, EmailMessage
+
+User = get_user_model()
+
+
 
 form = EmailSignupForm()
 
@@ -118,7 +124,7 @@ class PostListView(ListView):
 def post_list(request):
     category_count = get_category_count()
     most_recent = Post.objects.order_by('-timestamp')[:3]
-    post_list = Post.objects.all()
+    post_list = Post.objects.filter(is_traded=False)
     paginator = Paginator(post_list, 4)
     page_request_var = 'page'
     page = request.GET.get(page_request_var)
@@ -144,6 +150,7 @@ class PostDetailView(DetailView):
     template_name = 'post.html'
     context_object_name = 'post'
     form = CommentForm()
+   
 
     def get_object(self):
         obj = super().get_object()
@@ -162,6 +169,7 @@ class PostDetailView(DetailView):
         context['page_request_var'] = "page"
         context['category_count'] = category_count
         context['form'] = self.form
+        self.form.fields['asset_offered'].queryset=Post.objects.filter(author__user=self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -288,3 +296,22 @@ def post_delete(request, id):
     post = get_object_or_404(Post, id=id)
     post.delete()
     return redirect(reverse("post-list"))
+
+
+
+def accept_offer(request,  comment_id, asset_id):
+    asset = get_object_or_404(Post, pk=asset_id)
+    comment = get_object_or_404(Comment, pk=comment_id)
+    subject = "Your Offer has been accepted"
+    message = f"{asset.author} accepted your offer,{comment.content}, in exchange for {asset}. Contact them at {asset.author.user.email} to complete the exchange"
+    from_email = "AhiaMarketPlace@gmail.com"
+    recipient_list= ['{{asset.author.user.email}}', '{{comment.user.email}}']
+    email = EmailMessage(subject, message, from_email, recipient_list)
+    asset.is_traded = True 
+    asset.comment.asset.is_traded = True
+    asset.save()
+    email.attach_file(asset.file.path)
+    email.attach_file(comment.asset_offered.file.path)
+    email.send()
+    return render(request, 'offer_accepted.html')
+    
