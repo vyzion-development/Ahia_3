@@ -12,6 +12,9 @@
     <div class="container">
       <div class="row">
         <!-- Latest Posts -->
+          {% if post.is_traded %}
+          <h1>This asset is no longer availble</h1>
+          {% else %}
         <main class="post blog-post col-lg-8"> 
           <div class="container">
             <div class="post-single">
@@ -62,7 +65,7 @@
                 </div>
                 <div class="post-comments">
                   <header>
-                    <h3 class="h6">Post Comments<span class="no-of-comments">({{ post.comments.count }})</span></h3>
+                    <h3 class="h6">Trade Offers<span class="no-of-comments">({{ post.comments.count }})</span></h3>
                   </header>
                   {% for comment in post.get_comments %}
                   <div class="comment">
@@ -80,6 +83,13 @@
                     </div>
                     <div class="comment-body">
                       <p>{{ comment.content }}</p>
+                         {% if request.user.pk == post.author.user.pk %}
+                      <form action="{% url 'accept-offer' comment_id=comment.pk asset_id=post.pk %}">
+                      <button class="offer_button" type='submit'> 
+                        Accept Offer
+                      </button>
+                      </form>
+                      {% endif %}
                     </div>
                   </div>
                   {% endfor %}
@@ -87,7 +97,7 @@
                 {% if request.user.is_authenticated %}
                 <div class="add-comment">
                   <header>
-                    <h3 class="h6">Leave a reply</h3>
+                    <h3 class="h6">Make an offer</h3>
                   </header>
                   <form method="POST" action="." class="commenting-form">
                     {% csrf_token %}
@@ -108,7 +118,9 @@
             </div>
           </div>
         </main>
-        {% include 'sidebar.html' with most_recent=most_recent category_count=category_count %}        
+        {% include 'sidebar.html' with most_recent=most_recent category_count=category_count %}   
+        {% endif %}     
       </div>
     </div>
+   
 {% endblock content %}

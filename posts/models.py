@@ -57,6 +57,7 @@ class Post(models.Model):
         'self', related_name='previous', on_delete=models.SET_NULL, blank=True, null=True)
     next_post = models.ForeignKey(
         'self', related_name='next', on_delete=models.SET_NULL, blank=True, null=True)
+    is_traded = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
