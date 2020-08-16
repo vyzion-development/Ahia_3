@@ -44,11 +44,31 @@ version = "3.0.2"
 
 [[package]]
 category = "main"
+description = "HTTP REST client, simplified for Python"
+name = "python-http-client"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "3.2.7"
+
+[[package]]
+category = "main"
 description = "World timezone definitions, modern and historical"
 name = "pytz"
 optional = false
 python-versions = "*"
 version = "2020.1"
+
+[[package]]
+category = "main"
+description = "Twilio SendGrid library for Python"
+name = "sendgrid"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "6.4.5"
+
+[package.dependencies]
+python-http-client = ">=3.2.1"
+starkbank-ecdsa = ">=1.0.0"
 
 [[package]]
 category = "main"
@@ -58,8 +78,16 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.3.1"
 
+[[package]]
+category = "main"
+description = "A lightweight and fast pure python ECDSA library"
+name = "starkbank-ecdsa"
+optional = false
+python-versions = "*"
+version = "1.0.0"
+
 [metadata]
-content-hash = "270aa523cfd6b1440544b826267f66be443fc92122d97b7574f77297aa24c6e8"
+content-hash = "504914944b82de4160ae650df1d1165773e156666985bf30df0e08fd0266e469"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -79,11 +107,21 @@ django-tinymce = [
     {file = "django-tinymce-3.0.2.tar.gz", hash = "sha256:fe82e476059b27187eaec849b6b765ef9918a25e64e419861c4f507d0c8cc143"},
     {file = "django_tinymce-3.0.2-py2.py3-none-any.whl", hash = "sha256:0ad9c91851261dafb6f4abfc80de5560002fbfb1a681a1cec2f0eca349462a4a"},
 ]
+python-http-client = [
+    {file = "python_http_client-3.2.7.tar.gz", hash = "sha256:93d6a26b426e48b04e589c1f103e7c040193e4ccc379ea50cd6e12f94cca7c69"},
+]
 pytz = [
     {file = "pytz-2020.1-py2.py3-none-any.whl", hash = "sha256:a494d53b6d39c3c6e44c3bec237336e14305e4f29bbf800b599253057fbb79ed"},
     {file = "pytz-2020.1.tar.gz", hash = "sha256:c35965d010ce31b23eeb663ed3cc8c906275d6be1a34393a1d73a41febf4a048"},
 ]
+sendgrid = [
+    {file = "sendgrid-6.4.5-py3-none-any.whl", hash = "sha256:0bb53924d3f46e895c19150f4ee8451cebb59eee0aaa1f8f7232f37eac79ca7a"},
+    {file = "sendgrid-6.4.5.tar.gz", hash = "sha256:50e0061954ead24167a300f104a6c5ea11f1e132e4fdba440f634ed79a1cbef9"},
+]
 sqlparse = [
     {file = "sqlparse-0.3.1-py2.py3-none-any.whl", hash = "sha256:022fb9c87b524d1f7862b3037e541f68597a730a8843245c349fc93e1643dc4e"},
     {file = "sqlparse-0.3.1.tar.gz", hash = "sha256:e162203737712307dfe78860cc56c8da8a852ab2ee33750e33aeadf38d12c548"},
+]
+starkbank-ecdsa = [
+    {file = "starkbank-ecdsa-1.0.0.tar.gz", hash = "sha256:cd17ec9fa7ad8ae3fc81a63ddb7e0d7fb798a048e40c1a9c55afd1a207d1eff9"},
 ]

@@ -13,7 +13,7 @@ SECRET_KEY = 'k*b$$!%hiswnhp2pad)6(u4x_g)r5w%@&zlv&@2hrz4#f3+#57'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '134.209.224.211', 'ahia3--robseals.repl.co', 'ahia3.robseals.repl.co'
+ALLOWED_HOSTS = ['127.0.0.1', '134.209.224.211', 'ahia3--robseals.repl.co', 'ahia3.robseals.repl.co', 'ahia3-1--steveoris.repl.co', 'ahia3-1.steveoris.repl.co',
 ]
 
 
@@ -181,3 +181,14 @@ AUTHENTICATION_BACKENDS = (
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 SITE_ID = 1
+
+#sendgrid API info
+
+SENDGRID_API_KEY = os.getenv('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')
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+

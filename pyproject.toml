@@ -9,6 +9,7 @@ python = "^3.8"
 django-environ = "^0.4.5"
 django = "^3.1"
 django-tinymce = "^3.0.2"
+sendgrid = "^6.4.5"
 
 [tool.poetry.dev-dependencies]
 

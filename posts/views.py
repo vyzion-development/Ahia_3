@@ -1,3 +1,9 @@
+import os
+import sendgrid
+
+from django.core.mail import send_mail
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from django.db.models import Count, Q
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -306,7 +312,7 @@ def accept_offer(request,  comment_id, asset_id):
     message = f"{asset.author} accepted your offer,{comment.content}, in exchange for {asset}. Contact them at {asset.author.user.email} to complete the exchange"
     from_email = "AhiaMarketPlace@gmail.com"
     recipient_list= ['{{asset.author.user.email}}', '{{comment.user.email}}']
-    email = EmailMessage(subject, message, from_email, recipient_list)
+    email = send_mail(subject, message, from_email, recipient_list, fail_silently=False)
     asset.is_traded = True 
     asset.comment.asset.is_traded = True
     asset.save()
