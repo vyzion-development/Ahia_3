@@ -3,23 +3,24 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from posts.views import (
-    index,
-    search,
-    post_list,
-    post_detail,
-    post_create,
-    post_update,
-    post_delete,
-    IndexView,
-    PostListView,
-    PostDetailView,
-    PostCreateView,
-    PostUpdateView,
-    PostDeleteView,
-    accept_offer,
-    AboutView
-)
+from posts.views import views as blog_views
+# (
+#     index,
+#     search,
+#     post_list,
+#     post_detail,
+#     post_create,
+#     post_update,
+#     post_delete,
+#     IndexView,
+#     PostListView,
+#     PostDetailView,
+#     PostCreateView,
+#     PostUpdateView,
+#     PostDeleteView,
+#     accept_offer,
+#     AboutView
+# )
 from marketing.views import email_list_signup
 
 urlpatterns = [
@@ -28,24 +29,24 @@ urlpatterns = [
     path('accounts/login/', include('allauth.urls')),
     path('accounts/logout/', include('allauth.urls')),
     # path('', index),
-    path('', IndexView.as_view(), name='home'),
-    path('home', IndexView.as_view(), name='home'),
+    path('', blog_views(), name='home'),
+    path('home', blog_views.as_view(), name='home'),
     # path('blog/', post_list, name='post-list'),
-    path('blog/', PostListView.as_view(), name='post-list'),
-    path('search/', search, name='search'),
+    path('blog/', blog_views.as_view(), name='post-list'),
+    path('search/', blog_views, name='search'),
     path('email-signup/', email_list_signup, name='email-list-signup'),
     # path('create/', post_create, name='post-create'),
-    path('create/', PostCreateView.as_view(), name='post-create'),
+    path('create/', blog_views.as_view(), name='post-create'),
     # path('post/<id>/', post_detail, name='post-detail'),
-    path('post/<pk>/', PostDetailView.as_view(), name='post-detail'),
+    path('post/<pk>/', blog_views.as_view(), name='post-detail'),
     # path('post/<id>/update/', post_update, name='post-update'),
-    path('post/<pk>/update/', PostUpdateView.as_view(), name='post-update'),
+    path('post/<pk>/update/', blog_views.as_view(), name='post-update'),
     # path('post/<id>/delete/', post_delete, name='post-delete'),
-    path('post/<pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
+    path('post/<pk>/delete/', blog_views.as_view(), name='post-delete'),
     path('tinymce/', include('tinymce.urls')),
     path('accounts/', include('allauth.urls')),
-    path('accept_offer/<int:comment_id>/<int:asset_id>/'  , accept_offer, name='accept-offer'),
-    path('about/', AboutView , name='about'),
+    path('accept_offer/<int:comment_id>/<int:asset_id>/'  , blog_views, name='accept-offer'),
+    path('about/', blog_views , name='about'),
 ]
 
 if settings.DEBUG:
