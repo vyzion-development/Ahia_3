@@ -1,31 +1,58 @@
+import os
+import sendgrid
+import base64
+from django.core.mail import send_mail
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from django.db.models import Count, Q
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.db.utils import OperationalError
-
 from .forms import CommentForm, PostForm
 from .models import Post, Author, PostView, Comment
 from marketing.forms import EmailSignupForm
 from marketing.models import Signup
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail, EmailMessage
+from django.conf import settings
+from django.core.mail import send_mail
+import imghdr
+from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition,)
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from django.contrib import messages
+from django.contrib.auth import login, authenticate, REDIRECT_FIELD_NAME
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import (
+    LogoutView as BaseLogoutView, PasswordChangeView as BasePasswordChangeView,
+    PasswordResetDoneView as BasePasswordResetDoneView, PasswordResetConfirmView as BasePasswordResetConfirmView,
+)
+from django.shortcuts import get_object_or_404, redirect
+from django.utils.crypto import get_random_string
+from django.utils.decorators import method_decorator
+from django.utils.http import is_safe_url
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic import View, FormView
+from django.conf import settings
+
+
 
 User = get_user_model()
-
-
-
 form = EmailSignupForm()
-
 
 def get_author(user):
     qs = Author.objects.filter(user=user)
     if qs.exists():
         return qs[0]
     return None
-
-
 class SearchView(View):
     def get(self, request, *args, **kwargs):
         queryset = Post.objects.all()
@@ -39,8 +66,6 @@ class SearchView(View):
             'queryset': queryset
         }
         return render(request, 'search_results.html', context)
-
-
 def search(request):
     queryset = Post.objects.all()
     query = request.GET.get('q')
@@ -53,19 +78,14 @@ def search(request):
         'queryset': queryset
     }
     return render(request, 'search_results.html', context)
-
-
 def get_category_count():
     queryset = Post \
         .objects \
         .values('categories__title') \
         .annotate(Count('categories__title'))
     return queryset
-
-
 class IndexView(View):
     form = EmailSignupForm()
-
     def get(self, request, *args, **kwargs):
         featured = Post.objects.filter(featured=True)
         latest = Post.objects.order_by('-timestamp')[0:3]
@@ -75,7 +95,6 @@ class IndexView(View):
             'form': self.form
         }
         return render(request, 'index.html', context)
-
     def post(self, request, *args, **kwargs):
         email = request.POST.get("email")
         new_signup = Signup()
@@ -83,33 +102,26 @@ class IndexView(View):
         new_signup.save()
         messages.info(request, "Successfully subscribed")
         return redirect("home")
-
-
 def index(request):
     featured = Post.objects.filter(featured=True)
     latest = Post.objects.order_by('-timestamp')[0:3]
-
     if request.method == "POST":
         email = request.POST["email"]
         new_signup = Signup()
         new_signup.email = email
         new_signup.save()
-
     context = {
         'object_list': featured,
         'latest': latest,
         'form': form
     }
     return render(request, 'index.html', context)
-
-
 class PostListView(ListView):
     form = EmailSignupForm()
     model = Post
     template_name = 'blog.html'
     context_object_name = 'queryset'
     paginate_by = 1
-
     def get_context_data(self, **kwargs):
         category_count = get_category_count()
         most_recent = Post.objects.order_by('-timestamp')[:3]
@@ -119,8 +131,6 @@ class PostListView(ListView):
         context['category_count'] = category_count
         context['form'] = self.form
         return context
-
-
 def post_list(request):
     category_count = get_category_count()
     most_recent = Post.objects.order_by('-timestamp')[:3]
@@ -134,7 +144,6 @@ def post_list(request):
         paginated_queryset = paginator.page(1)
     except EmptyPage:
         paginated_queryset = paginator.page(paginator.num_pages)
-
     context = {
         'queryset': paginated_queryset,
         'most_recent': most_recent,
@@ -143,15 +152,11 @@ def post_list(request):
         'form': form
     }
     return render(request, 'blog.html', context)
-
-
 class PostDetailView(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
     form = CommentForm()
-   
-
     def get_object(self):
         obj = super().get_object()
         if self.request.user.is_authenticated:
@@ -160,7 +165,6 @@ class PostDetailView(DetailView):
                 post=obj
             )
         return obj
-
     def get_context_data(self, **kwargs):
         category_count = get_category_count()
         most_recent = Post.objects.order_by('-timestamp')[:3]
@@ -171,7 +175,6 @@ class PostDetailView(DetailView):
         context['form'] = self.form
         self.form.fields['asset_offered'].queryset=Post.objects.filter(author__user=self.request.user)
         return context
-
     def post(self, request, *args, **kwargs):
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -182,16 +185,12 @@ class PostDetailView(DetailView):
             return redirect(reverse("post-detail", kwargs={
                 'pk': post.pk
             }))
-
-
 def post_detail(request, id):
     category_count = get_category_count()
     most_recent = Post.objects.order_by('-timestamp')[:3]
     post = get_object_or_404(Post, id=id)
-
     if request.user.is_authenticated:
         PostView.objects.get_or_create(user=request.user, post=post)
-
     form = CommentForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
@@ -208,26 +207,20 @@ def post_detail(request, id):
         'form': form
     }
     return render(request, 'post.html', context)
-
-
 class PostCreateView(CreateView):
     model = Post
     template_name = 'post_create.html'
     form_class = PostForm
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Create'
         return context
-
     def form_valid(self, form):
         form.instance.author = get_author(self.request.user)
         form.save()
         return redirect(reverse("post-detail", kwargs={
             'pk': form.instance.pk
         }))
-
-
 def post_create(request):
     title = 'Create'
     form = PostForm(request.POST or None, request.FILES or None)
@@ -244,26 +237,20 @@ def post_create(request):
         'form': form
     }
     return render(request, "post_create.html", context)
-
-
 class PostUpdateView(UpdateView):
     model = Post
     template_name = 'post_create.html'
     form_class = PostForm
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Update'
         return context
-
     def form_valid(self, form):
         form.instance.author = get_author(self.request.user)
         form.save()
         return redirect(reverse("post-detail", kwargs={
             'pk': form.instance.pk
         }))
-
-
 def post_update(request, id):
     title = 'Update'
     post = get_object_or_404(Post, id=id)
@@ -284,20 +271,15 @@ def post_update(request, id):
         'form': form
     }
     return render(request, "post_create.html", context)
-
-
 class PostDeleteView(DeleteView):
     model = Post
     success_url = '/blog'
     template_name = 'post_confirm_delete.html'
-
-
 def post_delete(request, id):
     post = get_object_or_404(Post, id=id)
     post.delete()
     return redirect(reverse("post-list"))
-
-
+    
 
 def accept_offer(request,  comment_id, asset_id):
     asset = get_object_or_404(Post, pk=asset_id)
@@ -305,13 +287,25 @@ def accept_offer(request,  comment_id, asset_id):
     subject = "Your Offer has been accepted"
     message = f"{asset.author} accepted your offer,{comment.content}, in exchange for {asset}. Contact them at {asset.author.user.email} to complete the exchange"
     from_email = "AhiaMarketPlace@gmail.com"
-    recipient_list= ['{{asset.author.user.email}}', '{{comment.user.email}}']
+    recipient_list= []
     email = EmailMessage(subject, message, from_email, recipient_list)
-    asset.is_traded = True 
-    asset.comment.asset.is_traded = True
+    send_mail(subject, message , 'robertseals@vyziondevelopment.com' , fail_silently=False,
+    recipient_list = ['rseals13@gmail.com'], )
+    
+   
+    asset.is_traded = True
+    comment.asset_offered.is_traded = True 
     asset.save()
+    comment.save()
     email.attach_file(asset.file.path)
     email.attach_file(comment.asset_offered.file.path)
     email.send()
     return render(request, 'offer_accepted.html')
-    
+
+
+class AboutView(View):
+  template_name = 'team.html'
+  def about(request):
+    return redirect(request, 'team.html')
+
+   

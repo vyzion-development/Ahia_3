@@ -1,5 +1,7 @@
 import os
 
+from django.core.mail import send_mail
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -34,9 +36,9 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'tinymce',
-
+    
     'marketing',
-    'posts'
+    'posts',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -56,7 +58,7 @@ ROOT_URLCONF = 'blog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR, 'templates', 'allauth')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -167,7 +169,6 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 
-
 MAILCHIMP_API_KEY = ''
 MAILCHIMP_DATA_CENTER = ''
 MAILCHIMP_EMAIL_LIST_ID = ''
@@ -179,5 +180,28 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend'
 )
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+SENDGRID_API_KEY = os.environ.get('	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')
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+#django-allauth registraion settings 
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS =1
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+  
+# 1 day 
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400 
+  
+#or any other page 
+ACCOUNT_LOGOUT_REDIRECT_URL ='/accounts/login/' 
+  
+# redirects to profile page if not configured. 
+LOGIN_REDIRECT_URL = 'home'
 SITE_ID = 1

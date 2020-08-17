@@ -18,13 +18,18 @@ from posts.views import (
     PostUpdateView,
     PostDeleteView,
     accept_offer,
+    AboutView
 )
 from marketing.views import email_list_signup
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path(r'^accounts/', include('allauth.urls')),
+    path('accounts/login/', include('allauth.urls')),
+    path('accounts/logout/', include('allauth.urls')),
     # path('', index),
     path('', IndexView.as_view(), name='home'),
+    path('home', IndexView.as_view(), name='home'),
     # path('blog/', post_list, name='post-list'),
     path('blog/', PostListView.as_view(), name='post-list'),
     path('search/', search, name='search'),
@@ -40,6 +45,7 @@ urlpatterns = [
     path('tinymce/', include('tinymce.urls')),
     path('accounts/', include('allauth.urls')),
     path('accept_offer/<int:comment_id>/<int:asset_id>/'  , accept_offer, name='accept-offer'),
+    path('about/', AboutView , name='about'),
 ]
 
 if settings.DEBUG:

@@ -45,9 +45,9 @@ class Comment(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
-    overview = models.TextField(max_length=200, blank=True)
+    overview = models.TextField(max_length=200, blank=False)
     timestamp = models.DateTimeField(auto_now_add=True)
-    content = HTMLField(max_length=500, blank=True)
+    content = HTMLField(max_length=500, blank=False)
     # comment_count = models.IntegerField(default = 0)
     # view_count = models.IntegerField(default = 0)
     #textfiieleds not working
